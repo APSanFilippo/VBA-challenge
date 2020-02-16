@@ -1,0 +1,113 @@
+Sub HW_2_Final()
+
+'Set workbook variables
+
+
+Dim ws As Worksheet
+On Error Resume Next
+
+For Each ws In ThisWorkbook.Worksheets
+
+' Set an initial variable for holding the stock name
+
+  Dim Stock_Name As String
+  Dim Stock_Total As Double
+  Dim Year_Change As Double
+  Dim Percent_Change As Double
+  Dim Summary_Table_Row As Integer
+  Dim Greatest_Increase As Long
+  
+  ' Set summary table headers
+  
+  ws.Range("M1").Value = "Ticker"
+   ws.Range("N1").Value = "Yearly Change"
+   ws.Range("O1").Value = "Percent Change"
+   ws.Range("P1").Value = "Total Stock Volume"
+  
+  'Set largest value table
+  ws.Range("I2").Value = "Greatest % Increase"
+  ws.Range("I3").Value = "Greatest % Decrease"
+  ws.Range("I4").Value = "Greatest Total Volume"
+  
+  ws.Range("J1").Value = "Ticker"
+  ws.Range("K1").Value = "Value"
+  
+  ' Set table variables
+  
+  Summary_Table_Row = 2
+  LastRow = Cells(Rows.Count, 1).End(xlUp).Row
+  Stock_Total = 0
+  
+
+  ' Loop through all stock symbols
+  For i = 2 To LastRow
+  
+
+    ' Check if we are still within the same ticker, if we are not...
+    If ws.Cells(i + 1, 1).Value <> ws.Cells(i, 1).Value Then
+
+   ' Set the stock ticker
+    Stock_Name = ws.Cells(i, 1).Value
+    
+    ' Set the yearly change
+    year_open = ws.Cells(i, 3).Value
+    year_close = ws.Cells(i, 6).Value
+    yearly_change = year_close - year_open
+     
+     ' Set the percent change
+    Percent_Change = year_close / year_open
+      
+      ' Add to the stock Volume Total
+      Stock_Total = Stock_Total + ws.Cells(i, 7).Value
+
+
+
+      ' Print the ticker in the Summary Table
+       ws.Range("M" & Summary_Table_Row).Value = Stock_Name
+       ws.Range("N" & Summary_Table_Row).Value = yearly_change
+             If yearly_change >= 0 Then
+              ws.Range("N" & Summary_Table_Row).Interior.ColorIndex = 4
+  
+                ElseIf yearly_change <= 0 Then
+                 ws.Range("N" & Summary_Table_Row).Interior.ColorIndex = 3
+
+                End If
+
+
+       ws.Range("O" & Summary_Table_Row).Value = Percent_Change
+                 ws.Range("O" & Summary_Table_Row).NumberFormat = "0.00%"
+       ws.Range("P" & Summary_Table_Row).Value = Stock_Total
+
+      ' Add one to the summary table row
+      Summary_Table_Row = Summary_Table_Row + 1
+      
+      ' Reset the Stock Total
+      Stock_Total = 0
+
+    ' If the cell immediately following a row is the same stock...
+    Else
+
+      ' Add to the Stock Total
+      Stock_Total = Stock_Total + ws.Cells(i, 3).Value
+
+    End If
+
+  Next i
+  
+  'Find the greatest increase_decrease_volume
+  
+Greatest_Increase = Application.WorksheetFunction.Max(ws.Columns("O"))
+    ws.Range("K2").Value = Greatest_Increase
+    ws.Range("K2").NumberFormat = "0.00%"
+Greatest_decrease = Application.WorksheetFunction.Min(ws.Columns("O"))
+    ws.Range("K3").Value = Greatest_decrease
+    ws.Range("K3").NumberFormat = "0.00%"
+Greatest_Volume = Application.WorksheetFunction.Max(ws.Columns("P"))
+    ws.Range("K4").Value = Greatest_Volume
+
+
+  Next
+
+
+
+End Sub
